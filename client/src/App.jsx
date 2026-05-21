@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-const API = 'http://localhost:3000'
+const API = 'https://todo-app-server-1frd.onrender.com/'
 
 function App() {
   const [todos, setTodos] = useState([])
