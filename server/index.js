@@ -98,4 +98,10 @@ app.delete('/todos/:id', requireAuth, async (req, res) => {
   res.json({ success: true })
 })
 
+app.delete('/auth/account', requireAuth, async (req, res) => {
+  await prisma.todo.deleteMany({ where: { userId: req.userId } })
+  await prisma.user.delete({ where: { id: req.userId } })
+  res.json({ success: true })
+})
+
 app.listen(3000, () => console.log('Server running on http://localhost:3000'))

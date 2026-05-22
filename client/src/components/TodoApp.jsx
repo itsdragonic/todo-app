@@ -39,89 +39,53 @@ export default function TodoApp({ username, onLogout }) {
     onLogout()
   }
 
+  const remaining = todos.filter(t => !t.done).length
+
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#0f0f0f',
-      fontFamily: 'Georgia, serif',
-    }}>
+    <div className="min-h-screen bg-[#0f0f0f]">
       {/* Header */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '20px 32px',
-        borderBottom: '1px solid #1e1e1e',
-      }}>
-        <h1 style={{ color: '#f0ede6', fontSize: 20, fontWeight: 400, margin: 0, letterSpacing: '-0.3px' }}>
-          {username}'s tasks
-        </h1>
+      <header className="flex justify-between items-center px-8 py-5 border-b border-[#1e1e1e]">
+        <div>
+          <h1 className="text-[#f0ede6] text-lg font-normal font-serif tracking-tight">
+            {username}'s tasks
+          </h1>
+          <p className="text-[#444] text-xs font-sans mt-0.5">
+            {remaining} remaining
+          </p>
+        </div>
         <motion.button
           whileHover={{ color: '#f0ede6' }}
           whileTap={{ scale: 0.92 }}
           onClick={() => setSidebarOpen(true)}
-          style={{
-            background: 'none', border: 'none',
-            color: '#555', cursor: 'pointer',
-            display: 'flex', padding: 4,
-            transition: 'color 0.2s',
-          }}
+          className="text-[#555] bg-transparent border-none cursor-pointer flex p-1 transition-colors"
         >
           <Menu size={22} />
         </motion.button>
-      </div>
+      </header>
 
-      {/* Main content */}
-      <div style={{ maxWidth: 560, margin: '0 auto', padding: '40px 24px' }}>
+      {/* Content */}
+      <main className="max-w-xl mx-auto px-6 py-10">
         {/* Input */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 32 }}>
+        <div className="flex gap-2 mb-8">
           <input
             value={text}
             onChange={e => setText(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addTodo()}
             placeholder="What needs to be done?"
-            style={{
-              flex: 1,
-              padding: '12px 16px',
-              background: '#1a1a1a',
-              border: '1px solid #2a2a2a',
-              borderRadius: 4,
-              color: '#f0ede6',
-              fontSize: 15,
-              fontFamily: 'sans-serif',
-              outline: 'none',
-            }}
+            className="flex-1 px-4 py-3 bg-[#1a1a1a] border border-[#2a2a2a] rounded-sm text-[#f0ede6] text-sm font-sans"
           />
           <motion.button
-            whileHover={{ background: '#e8e4dc' }}
+            whileHover={{ backgroundColor: '#e8e4dc' }}
             whileTap={{ scale: 0.97 }}
             onClick={addTodo}
-            style={{
-              padding: '12px 20px',
-              background: '#f0ede6',
-              color: '#0f0f0f',
-              border: 'none',
-              borderRadius: 4,
-              fontSize: 15,
-              fontFamily: 'sans-serif',
-              fontWeight: 600,
-              cursor: 'pointer',
-              transition: 'background 0.2s',
-            }}
+            className="px-5 py-3 bg-[#f0ede6] text-[#0f0f0f] border-none rounded-sm text-sm font-sans font-semibold cursor-pointer"
           >
             Add
           </motion.button>
         </div>
 
-        {/* Todo count */}
-        {todos.length > 0 && (
-          <p style={{ color: '#444', fontSize: 12, fontFamily: 'sans-serif', marginBottom: 16, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
-            {todos.filter(t => !t.done).length} remaining · {todos.length} total
-          </p>
-        )}
-
-        {/* Todo list */}
-        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+        {/* List */}
+        <ul className="list-none p-0 m-0">
           <AnimatePresence>
             {todos.map(todo => (
               <TodoItem
@@ -136,18 +100,19 @@ export default function TodoApp({ username, onLogout }) {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              style={{ color: '#333', fontFamily: 'sans-serif', fontSize: 14, textAlign: 'center', marginTop: 48 }}
+              className="text-[#333] font-sans text-sm text-center mt-16"
             >
               No tasks yet. Add one above.
             </motion.p>
           )}
         </ul>
-      </div>
+      </main>
 
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
         onDeleteAccount={handleDeleteAccount}
+        onLogout={onLogout}
       />
     </div>
   )
