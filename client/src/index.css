@@ -8,30 +8,6 @@ body {
   margin: 0;
 }
 
-:root {
-  --bg: #ffffff;
-  --text: #111827;
-  --text-h: #0f172a;
-  --border: #e5e7eb;
-  --accent: #1f2937;
-  --accent-bg: #f3f4f6;
-  --accent-border: #d1d5db;
-  --social-bg: #f9fafb;
-  --shadow: 0 4px 12px rgba(16,24,40,0.06);
-}
-
-:root[data-theme="dark"] {
-  --bg: #0f1724;
-  --text: #e6eef8;
-  --text-h: #f3f4f6;
-  --border: #1f2937;
-  --accent: #e6eef8;
-  --accent-bg: #0b1220;
-  --accent-border: #374151;
-  --social-bg: #071022;
-  --shadow: 0 6px 18px rgba(2,6,23,0.6);
-}
-
 input::placeholder {
   color: #555;
 }

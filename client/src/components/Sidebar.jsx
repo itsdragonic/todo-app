@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Trash2, LogOut, Sun, Moon } from 'lucide-react'
+import { X, Trash2, LogOut } from 'lucide-react'
 import { api } from '../api'
-import { applyTheme, currentTheme } from '../theme'
 
 export default function Sidebar({ open, onClose, onDeleteAccount, onLogout }) {
   async function handleDeleteAccount() {
@@ -43,22 +42,6 @@ export default function Sidebar({ open, onClose, onDeleteAccount, onLogout }) {
             </div>
 
             <div className="flex flex-col gap-2">
-              <button
-                onClick={async () => {
-                  const cur = currentTheme() === 'dark' ? 'dark' : 'light'
-                  const next = cur === 'dark' ? 'light' : 'dark'
-                  try {
-                    await api.updateTheme(next)
-                    applyTheme(next)
-                  } catch {
-                    alert('Unable to update theme')
-                  }
-                }}
-                className="flex items-center gap-3 w-full px-4 py-3 bg-transparent border border-[#2a2a2a] rounded-sm text-[#666] text-sm font-sans cursor-pointer hover:border-[#444] hover:text-[#aaa] transition-all text-left"
-              >
-                {currentTheme() === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
-                Toggle theme
-              </button>
               <button
                 onClick={() => { onLogout(); onClose() }}
                 className="flex items-center gap-3 w-full px-4 py-3 bg-transparent border border-[#2a2a2a] rounded-sm text-[#666] text-sm font-sans cursor-pointer hover:border-[#444] hover:text-[#aaa] transition-all text-left"

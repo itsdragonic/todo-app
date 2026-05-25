@@ -10,7 +10,6 @@ model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
   password  String
-  theme     String   @default("light")
   createdAt DateTime @default(now())
   todos     Todo[]
 }

@@ -65,24 +65,6 @@ app.post('/auth/login', async (req, res) => {
   res.json({ token, username: user.username })
 })
 
-// ── User routes ───────────────────────────────────────────────
-app.get('/users/me', requireAuth, async (req, res) => {
-  const user = await prisma.user.findUnique({ where: { id: req.userId } })
-  if (!user) return res.status(404).json({ error: 'User not found' })
-  res.json({ id: user.id, username: user.username, theme: user.theme || 'light' })
-})
-
-app.put('/users/me/theme', requireAuth, async (req, res) => {
-  const { theme } = req.body
-  if (!theme || (theme !== 'light' && theme !== 'dark'))
-    return res.status(400).json({ error: 'Invalid theme' })
-  const user = await prisma.user.update({
-    where: { id: req.userId },
-    data: { theme }
-  })
-  res.json({ theme: user.theme })
-})
-
 // ── Todo routes (protected) ───────────────────────────────────
 app.get('/todos', requireAuth, async (req, res) => {
   const todos = await prisma.todo.findMany({
