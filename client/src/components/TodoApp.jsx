@@ -42,14 +42,14 @@ export default function TodoApp({ username, onLogout }) {
   const remaining = todos.filter(t => !t.done).length
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f]">
+    <div className="min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
       {/* Header */}
       <header className="flex justify-between items-center px-8 py-5 border-b border-[#1e1e1e]">
         <div>
-          <h1 className="text-[#f0ede6] text-lg font-normal font-serif tracking-tight">
+          <h1 className="text-lg font-normal font-serif tracking-tight" style={{ color: 'var(--text-h)' }}>
             {username}'s tasks
           </h1>
-          <p className="text-[#444] text-xs font-sans mt-0.5">
+          <p className="text-xs font-sans mt-0.5" style={{ color: 'var(--text)' }}>
             {remaining} remaining
           </p>
         </div>
@@ -72,13 +72,15 @@ export default function TodoApp({ username, onLogout }) {
             onChange={e => setText(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && addTodo()}
             placeholder="What needs to be done?"
-            className="flex-1 px-4 py-3 bg-[#1a1a1a] border border-[#2a2a2a] rounded-sm text-[#f0ede6] text-sm font-sans"
+            className="flex-1 px-4 py-3 border rounded-sm text-sm font-sans"
+            style={{ background: 'var(--accent-bg)', borderColor: 'var(--accent-border)', color: 'var(--accent)' }}
           />
           <motion.button
-            whileHover={{ backgroundColor: '#e8e4dc' }}
+            whileHover={{ opacity: 0.9 }}
             whileTap={{ scale: 0.97 }}
             onClick={addTodo}
-            className="px-5 py-3 bg-[#f0ede6] text-[#0f0f0f] border-none rounded-sm text-sm font-sans font-semibold cursor-pointer"
+            className="px-5 py-3 border-none rounded-sm text-sm font-sans font-semibold cursor-pointer"
+            style={{ background: 'var(--accent-bg)', color: 'var(--accent)' }}
           >
             Add
           </motion.button>

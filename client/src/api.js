@@ -16,4 +16,6 @@ export const api = {
   toggleTodo:  (id, done) => axios.patch(`${BASE}/todos/${id}`, { done }, { headers: headers() }),
   deleteTodo:  (id)       => axios.delete(`${BASE}/todos/${id}`, { headers: headers() }),
   deleteAccount: ()       => axios.delete(`${BASE}/auth/account`, { headers: headers() }),
+  getMe:       ()         => axios.get(`${BASE}/users/me`, { headers: headers() }),
+  updateTheme: (theme)    => axios.put(`${BASE}/users/me/theme`, { theme }, { headers: headers() }),
 }
