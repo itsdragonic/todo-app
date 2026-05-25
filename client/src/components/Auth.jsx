@@ -5,26 +5,11 @@ import { api } from '../api'
 export default function Auth({ onLogin }) {
   const [isRegistering, setIsRegistering] = useState(false)
   const [form, setForm] = useState({ username: '', password: '' })
-  const [errors, setErrors] = useState({})
+  const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
-  function validate() {
-    const e = {}
-    if (!form.username) e.username = 'Username is required'
-    else if (isRegistering && (form.username.length < 3 || form.username.length > 16))
-      e.username = 'Username must be 3–16 characters'
-
-    if (!form.password) e.password = 'Password is required'
-    else if (isRegistering && (form.password.length < 3 || form.password.length > 16))
-      e.password = 'Password must be 3–16 characters'
-
-    return e
-  }
-
   async function handleSubmit() {
-    const e = validate()
-    if (Object.keys(e).length > 0) { setErrors(e); return }
-    setErrors({})
+    setError('')
     setLoading(true)
     try {
       const res = isRegistering ? await api.register(form) : await api.login(form)
@@ -32,10 +17,7 @@ export default function Auth({ onLogin }) {
       localStorage.setItem('username', res.data.username)
       onLogin(res.data.token, res.data.username)
     } catch (err) {
-      const message = err.response?.data?.error || 'Something went wrong'
-      if (message.toLowerCase().includes('username')) setErrors({ username: message })
-      else if (message.toLowerCase().includes('password')) setErrors({ password: message })
-      else setErrors({ general: message })
+      setError(err.response?.data?.error || 'Something went wrong')
     } finally {
       setLoading(false)
     }
@@ -53,79 +35,33 @@ export default function Auth({ onLogin }) {
           {isRegistering ? 'Create account' : 'Welcome back'}
         </h1>
         <p className="text-[#666] text-sm font-sans mb-8">
-          {isRegistering ? 'Username and password, 3–16 characters.' : 'Sign in to your workspace.'}
+          {isRegistering ? 'Start tracking your tasks.' : 'Sign in to your workspace.'}
         </p>
 
         <AnimatePresence>
-          {errors.general && (
+          {error && (
             <motion.p
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               className="text-red-400 text-xs font-sans mb-4"
             >
-              {errors.general}
+              {error}
             </motion.p>
           )}
         </AnimatePresence>
 
-        {/* Username field */}
-        <div className="mb-3">
+        {['username', 'password'].map((field) => (
           <input
-            type="text"
-            placeholder="Username"
-            value={form.username}
-            onChange={e => {
-              setForm({ ...form, username: e.target.value })
-              if (errors.username) setErrors({ ...errors, username: null })
-            }}
+            key={field}
+            type={field === 'password' ? 'password' : 'text'}
+            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+            value={form[field]}
+            onChange={e => setForm({ ...form, [field]: e.target.value })}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-            className={`block w-full px-4 py-3 bg-[#111] border rounded-sm text-[#f0ede6] text-sm font-sans transition-colors ${
-              errors.username ? 'border-red-800' : 'border-[#2a2a2a]'
-            }`}
+            className="block w-full px-4 py-3 mb-3 bg-[#111] border border-[#2a2a2a] rounded-sm text-[#f0ede6] text-sm font-sans"
           />
-          <AnimatePresence>
-            {errors.username && (
-              <motion.p
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="text-red-400 text-xs font-sans mt-1.5 ml-1"
-              >
-                {errors.username}
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Password field */}
-        <div className="mb-3">
-          <input
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={e => {
-              setForm({ ...form, password: e.target.value })
-              if (errors.password) setErrors({ ...errors, password: null })
-            }}
-            onKeyDown={e => e.key === 'Enter' && handleSubmit()}
-            className={`block w-full px-4 py-3 bg-[#111] border rounded-sm text-[#f0ede6] text-sm font-sans transition-colors ${
-              errors.password ? 'border-red-800' : 'border-[#2a2a2a]'
-            }`}
-          />
-          <AnimatePresence>
-            {errors.password && (
-              <motion.p
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="text-red-400 text-xs font-sans mt-1.5 ml-1"
-              >
-                {errors.password}
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
+        ))}
 
         <motion.button
           whileHover={{ backgroundColor: '#e8e4dc' }}
@@ -138,7 +74,7 @@ export default function Auth({ onLogin }) {
         </motion.button>
 
         <button
-          onClick={() => { setIsRegistering(!isRegistering); setErrors({}) }}
+          onClick={() => { setIsRegistering(!isRegistering); setError('') }}
           className="w-full py-3 mt-3 bg-transparent border border-[#2a2a2a] rounded-sm text-[#666] text-xs font-sans cursor-pointer hover:border-[#444] transition-colors"
         >
           {isRegistering ? 'Already have an account? Login' : "Don't have an account? Register"}

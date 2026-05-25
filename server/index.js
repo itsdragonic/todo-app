@@ -35,19 +35,12 @@ function requireAuth(req, res, next) {
 // ── Auth routes ───────────────────────────────────────────────
 app.post('/auth/register', async (req, res) => {
   const { username, password } = req.body
-
   if (!username || !password)
     return res.status(400).json({ error: 'Username and password required' })
 
-  if (username.length < 3 || username.length > 16)
-    return res.status(400).json({ error: 'Username must be between 3 and 16 characters' })
-
-  if (password.length < 3 || password.length > 16)
-    return res.status(400).json({ error: 'Password must be between 3 and 16 characters' })
-
   const existing = await prisma.user.findUnique({ where: { username } })
   if (existing)
-    return res.status(400).json({ error: 'Username is already taken' })
+    return res.status(400).json({ error: 'Username already taken' })
 
   const hashed = await bcrypt.hash(password, 10)
   const user = await prisma.user.create({
