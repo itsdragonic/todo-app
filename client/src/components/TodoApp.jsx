@@ -1,37 +1,56 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu } from 'lucide-react'
 import { api } from '../api'
+import { enqueue } from '../queue'
 import TodoItem from './TodoItem'
 import Sidebar from './Sidebar'
+import SyncIndicator from './SyncIndicator'
 
 export default function TodoApp({ username, onLogout }) {
   const [todos, setTodos] = useState([])
   const [text, setText] = useState('')
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const nextTempId = useRef(-1) // temporary negative IDs for optimistic items
 
   useEffect(() => { fetchTodos() }, [])
 
   async function fetchTodos() {
-    const res = await api.getTodos()
-    setTodos(res.data)
+    try {
+      const res = await api.getTodos()
+      setTodos(res.data)
+    } catch {
+      // server not up yet, will retry via queue on next action
+    }
   }
 
-  async function addTodo() {
+  function addTodo() {
     if (!text.trim()) return
-    await api.createTodo(text)
+    const tempId = nextTempId.current--
+    const optimistic = { id: tempId, text, done: false, createdAt: new Date().toISOString() }
+
+    // Show instantly
+    setTodos(prev => [optimistic, ...prev])
     setText('')
-    fetchTodos()
+
+    // Queue the real API call, then refresh to get the real ID
+    enqueue({ type: 'CREATE_TODO', text, onSuccess: fetchTodos })
   }
 
-  async function toggleTodo(todo) {
-    await api.toggleTodo(todo.id, !todo.done)
-    fetchTodos()
+  function toggleTodo(todo) {
+    // Update instantly
+    setTodos(prev => prev.map(t => t.id === todo.id ? { ...t, done: !t.done } : t))
+
+    // Queue the real API call
+    enqueue({ type: 'TOGGLE_TODO', id: todo.id, done: !todo.done })
   }
 
-  async function deleteTodo(id) {
-    await api.deleteTodo(id)
-    fetchTodos()
+  function deleteTodo(id) {
+    // Remove instantly
+    setTodos(prev => prev.filter(t => t.id !== id))
+
+    // Queue the real API call
+    enqueue({ type: 'DELETE_TODO', id })
   }
 
   function handleDeleteAccount() {
@@ -53,14 +72,17 @@ export default function TodoApp({ username, onLogout }) {
             {remaining} remaining
           </p>
         </div>
-        <motion.button
-          whileHover={{ color: '#f0ede6' }}
-          whileTap={{ scale: 0.92 }}
-          onClick={() => setSidebarOpen(true)}
-          className="text-[#555] bg-transparent border-none cursor-pointer flex p-1 transition-colors"
-        >
-          <Menu size={22} />
-        </motion.button>
+        <div className="flex items-center gap-4">
+          <SyncIndicator />
+          <motion.button
+            whileHover={{ color: '#f0ede6' }}
+            whileTap={{ scale: 0.92 }}
+            onClick={() => setSidebarOpen(true)}
+            className="text-[#555] bg-transparent border-none cursor-pointer flex p-1 transition-colors"
+          >
+            <Menu size={22} />
+          </motion.button>
+        </div>
       </header>
 
       {/* Content */}
